@@ -2,7 +2,7 @@
 ⍝ ]box on -style=max
 ⍝ ]rows on
 
-asciiToPriority ← ⊣-{⍵>90:96⋄38}
+asciiToPriority ← 58∘|20∘+
 splitInTwo ←  ↓ 2∘,∘(÷∘2≢)⍴⊢
 
 lines ← ⊃⎕NGET'src/03.in'1
