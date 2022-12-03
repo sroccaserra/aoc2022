@@ -5,6 +5,6 @@
 asciiToPriority ← 58∘|20∘+
 splitInTwo ←  ↓ 2∘,∘(÷∘2≢)⍴⊢
 
-lines ← ⊃⎕NGET'src/03.in'1
-⎕← +/ ⊃∘asciiToPriority∘⎕UCS¨(∪∘⊃∩/∘splitInTwo)¨ lines
-⎕← +/ ⊃∘↑∘asciiToPriority∘⎕UCS¨∪¨↑∩/¨({3/⍳(÷∘3)≢⍵}⊆⊢)lines
+priorities ← asciiToPriority∘⎕UCS¨ ⊃⎕NGET'src/03.in'1
+⎕← +/⊃∘(∪∘⊃∩/∘splitInTwo)¨ priorities
+⎕← +/⊃∘∪¨↑∩/¨({3/⍳(÷∘3)≢⍵}⊆⊢) priorities
