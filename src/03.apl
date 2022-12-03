@@ -3,7 +3,7 @@
 ⍝ ]rows on
 
 asciiToPriority ← 58∘|20∘+
-splitInTwo ←  ↓ 2∘,∘(2÷⍨≢)⍴⊢
+splitInTwo ← {↓2(2÷⍨≢⍵)⍴⍵}
 chunkByThree ← {3/⍳3÷⍨≢⍵}⊆⊢
 findUniqueCommons ← ⊃∘∪¨∘↑∩/¨
 
