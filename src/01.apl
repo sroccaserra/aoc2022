@@ -1,6 +1,3 @@
-solve1 ← {⌈/⍵ }
-solve2 ← {+/3↑⍵[⍒⍵]}
-
-sums ← (+/⍎¨)¨ ((×≢¨)⊆⊢) ⊃⎕NGET'src/01.in'1
-⎕ ← solve1 sums
-⎕ ← solve2 sums
+sums ← +/¨(≢¨⊆⊢),⎕CSV('src/01.in')⍬4
+⎕← ⌈/sums
+⎕← {+/3↑⍵[⍒⍵]}sums
