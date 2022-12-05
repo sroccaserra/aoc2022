@@ -1,5 +1,6 @@
 import fileinput
 from re import split
+from copy import deepcopy
 
 
 def solve_1(stacks, moves):
@@ -9,6 +10,24 @@ def solve_1(stacks, moves):
         n = move[0]
         for _ in range(n):
             crate = src.pop()
+            dst.append(crate)
+    result = ''
+    for stack in stacks:
+        result += stack[-1]
+    return result
+
+
+def solve_2(stacks, moves):
+    for move in moves:
+        src = stacks[move[1]-1]
+        dst = stacks[move[2]-1]
+        n = move[0]
+        tmp = []
+        for _ in range(n):
+            crate = src.pop()
+            tmp.append(crate)
+        for _ in range(n):
+            crate = tmp.pop()
             dst.append(crate)
     result = ''
     for stack in stacks:
@@ -31,4 +50,5 @@ for n in reversed(range(len(header))):
         c = line[i]
         if c != ' ':
             stack.append(line[i])
-print(solve_1(stacks, moves))
+print(solve_1(deepcopy(stacks), moves))
+print(solve_2(stacks, moves))
