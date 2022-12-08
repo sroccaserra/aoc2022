@@ -3,32 +3,7 @@ from re import split
 from copy import deepcopy
 
 
-def solve_1(logs):
-    commands = []
-    log_stack = deepcopy(logs)
-    log_stack.reverse()
-    limit = 10
-    while log_stack:
-        command = []
-        while True:
-            command.append(log_stack.pop())
-
-            if len(log_stack) == 0 or log_stack[-1].startswith('$'):
-                break;
-        commands.append(command)
-    session = { 'root': None, 'cwd': None }
-    for command in commands:
-        instruction = command[0].split()
-        if instruction[1] == 'cd':
-            cd(session, instruction[2])
-        elif instruction[1] == 'ls':
-            for line in command[1:]:
-                process_ls_output_line(session, line)
-        else:
-            raise 'Unknown Instruction: ' + instruction[1]
-        limit -= 1
-
-    root = session['root']
+def solve_1(root):
     result = 0
     stack = [root]
     while stack:
@@ -87,5 +62,34 @@ def update_parents_sizes(directory, size):
         cwd['size'] += size
 
 
+def describe_file_system_from_logs(logs):
+    commands = []
+    log_stack = deepcopy(logs)
+    log_stack.reverse()
+    limit = 10
+    while log_stack:
+        command = []
+        while True:
+            command.append(log_stack.pop())
+
+            if len(log_stack) == 0 or log_stack[-1].startswith('$'):
+                break;
+        commands.append(command)
+    session = { 'root': None, 'cwd': None }
+    for command in commands:
+        instruction = command[0].split()
+        if instruction[1] == 'cd':
+            cd(session, instruction[2])
+        elif instruction[1] == 'ls':
+            for line in command[1:]:
+                process_ls_output_line(session, line)
+        else:
+            raise 'Unknown Instruction: ' + instruction[1]
+        limit -= 1
+
+    return session['root']
+
+
 logs = [line.rstrip() for line in fileinput.input()]
-print(solve_1(logs))
+root = describe_file_system_from_logs(logs)
+print(solve_1(root))
