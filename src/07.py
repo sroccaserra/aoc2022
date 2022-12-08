@@ -18,6 +18,26 @@ def solve_1(root):
     return result
 
 
+def solve_2(root):
+    free_size_needed = 30000000
+    max_size = 70000000
+    target_size = max_size-free_size_needed
+    root_size = root['size']
+    to_delete = root_size - target_size
+    result = max_size
+    stack = [root]
+    while stack:
+        cwd = stack.pop()
+        size = cwd['size']
+        if size >= to_delete and size < result:
+            result = size
+        children = cwd['children']
+        for child_name in children:
+            stack.append(children[child_name])
+
+    return result
+
+
 def cd(session, dirname):
     if session.get('root') is None:
         root = create_dir(dirname, None)
@@ -93,3 +113,4 @@ def describe_file_system_from_logs(logs):
 logs = [line.rstrip() for line in fileinput.input()]
 root = describe_file_system_from_logs(logs)
 print(solve_1(root))
+print(solve_2(root))
