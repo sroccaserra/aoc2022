@@ -8,7 +8,7 @@ def solve(rope, commands):
     for command in commands:
         action = actions.get(command[0])
         for _ in range(command[1]):
-            action(visited, rope)
+            action(rope[0])
             for i in range(1, len(rope)):
                 follow(rope[i-1], rope[i])
             visited.add(tuple(rope[-1]))
@@ -34,20 +34,20 @@ def print_points(visited, rope):
         print()
 
 
-def up(visited, rope):
-    rope[0][1] += 1
+def up(head):
+    head[1] += 1
 
 
-def down(visited, rope):
-    rope[0][1] -= 1
+def down(head):
+    head[1] -= 1
 
 
-def left(visited, rope):
-    rope[0][0] -= 1
+def left(head):
+    head[0] -= 1
 
 
-def right(visited, rope):
-    rope[0][0] += 1
+def right(head):
+    head[0] += 1
 
 
 def follow(h, t):
