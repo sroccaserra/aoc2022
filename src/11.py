@@ -1,18 +1,31 @@
 import fileinput
 from collections import deque
+from copy import deepcopy
+from functools import reduce
 
 
-def solve(monkeys):
+def solve_1(monkeys):
     for _ in range(20):
         for monkey in monkeys:
-            step(monkeys, monkey)
+            step_1(monkeys, monkey)
     inspections = [m['inspections'] for m in monkeys]
     inspections.sort()
     inspections.reverse()
     return inspections[0]*inspections[1]
 
 
-def step(monkeys, monkey):
+def solve_2(monkeys):
+    print(bigval)
+    for _ in range(10000):
+        for monkey in monkeys:
+            step_2(monkeys, monkey)
+    inspections = [m['inspections'] for m in monkeys]
+    inspections.sort()
+    inspections.reverse()
+    return inspections[0]*inspections[1]
+
+
+def step_1(monkeys, monkey):
     items = monkey['items']
     while items:
         monkey['inspections'] += 1
@@ -23,6 +36,23 @@ def step(monkeys, monkey):
         else:
             dst = monkey['next_f']
         monkeys[dst]['items'].append(item)
+
+
+def step_2(monkeys, monkey):
+    items = monkey['items']
+    while items:
+        monkey['inspections'] += 1
+        item = items.popleft()
+        key = (monkey['n'], item)
+        test = monkey['test']
+        item = monkey['operation'](item)
+        if item % test == 0:
+            dst = monkey['next_t']
+        else:
+            dst = monkey['next_f']
+
+        next_monkey = monkeys[dst]
+        next_monkey['items'].append(item % bigval)
 
 
 lines = [line.strip() for line in fileinput.input()]
@@ -48,4 +78,6 @@ while True:
             'inspections': 0,
             }
     monkeys.append(monkey)
-print(solve(monkeys))
+bigval = reduce(lambda x, y: x * y, [monkey['test'] for monkey in monkeys])
+print(solve_1(deepcopy(monkeys)))
+print(solve_2(monkeys))
