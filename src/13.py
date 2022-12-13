@@ -1,5 +1,5 @@
 import sys
-from functools import cmp_to_key
+from functools import cmp_to_key, reduce
 
 
 NEXT = None
@@ -15,10 +15,7 @@ def solve_1(packet_pairs):
 
 
 def solve_2(packet_pairs):
-    packets = []
-    for (lhs, rhs) in packet_pairs:
-        packets.append(lhs)
-        packets.append(rhs)
+    packets = list(reduce(lambda acc, x: acc + x, packet_pairs))
     packets.append([[2]])
     packets.append([[6]])
     sorted_packets = sorted(packets, key=cmp_to_key(compare_packets))
