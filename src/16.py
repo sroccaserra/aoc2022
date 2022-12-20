@@ -15,9 +15,10 @@ def solve_1(graph):
     t = 0
     target_time = 30
     for _ in range(len(to_open)):
-        (target_name, ticks) = find_target(graph, to_open, src)
+        time_left = target_time - t
+        (target_name, ticks) = find_target(graph, time_left, to_open, src)
         ticks += OPENING_T
-        print(target_name) # wrong order here, should be d b j h e c, actual is d j b h e c
+        print(time_left, graph[target_name]) # wrong order here, should be d b j h e c, actual is d b j e h c
         if t + ticks > target_time:
             ticks = target_time - t
         for o in opened:
@@ -29,10 +30,10 @@ def solve_1(graph):
     for o in opened:
         result += o*(target_time-t)
 
-    return result, t
+    return result
 
 
-def find_target(graph, to_open, src):
+def find_target(graph, time_left, to_open, src):
     distances = {src: NaD}
     q = deque([(src, 0)])
     while q:
@@ -52,11 +53,12 @@ def find_target(graph, to_open, src):
         if farthest < d:
             farthest = d
 
-    max_gain = ('', 0)
+    candidate = next(iter(to_open))
+    max_gain = (candidate, distances[candidate])
     for (n, d) in distances.items():
         if d == NaD:
             continue
-        target_t = farthest + OPENING_T + TICK
+        target_t = farthest + OPENING_T
         pressure = graph[n][PRESSURE]
         released = (target_t - d - OPENING_T)*pressure
         if max_gain[1] < released:
