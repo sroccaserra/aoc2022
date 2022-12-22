@@ -1,33 +1,27 @@
 import fileinput
-from collections import deque
 
 
-INITIAL = 'o'
-MOVED = 'x'
-
-
-def solve_1(numbers):
+def solve(numbers, nb_mixes, key):
     size = len(numbers)
-    moved = [(INITIAL, n) for n in numbers]
+    moved = [(i, n*key) for i, n in enumerate(numbers)]
     p = 0
-    for _ in range(size):
-        while True:
-            (status, n) = moved[p]
-            if status == INITIAL:
-                break
-            p = (p + 1)%size
-        src = p
-        nb_moves = n%(size-1)
-        if nb_moves == 0:
-            moved[src] = (MOVED, n)
-        for _ in range(nb_moves):
-            dst = (src+1)%size
-            tmp = moved[dst]
-            moved[dst] = (MOVED, n)
-            moved[src] = tmp
-            src = dst
-    for (status, _) in moved:
-        assert status == MOVED
+    for n_mix in range(nb_mixes):
+        for i in range(size):
+            while True:
+                (nb_mixed, n) = moved[p]
+                if nb_mixed == i:
+                    break
+                p = (p + 1)%size
+            src = p
+            nb_moves = n%(size-1)
+            if nb_moves == 0:
+                moved[src] = (nb_mixed, n)
+            for _ in range(nb_moves):
+                dst = (src+1)%size
+                tmp = moved[dst]
+                moved[dst] = (nb_mixed, n)
+                moved[src] = tmp
+                src = dst
 
     offset = 0
     for (_, n) in moved:
@@ -41,4 +35,5 @@ def solve_1(numbers):
 
 
 numbers = [int(line.strip()) for line in fileinput.input()]
-print(solve_1(numbers))
+print(solve(numbers, 1, 1))
+print(solve(numbers, 10, 811589153))
