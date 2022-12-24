@@ -7,10 +7,11 @@ D = 1
 L = 2
 U = 3
 
+FACE_SIZE = 50
+N_FACE_COLS = 3
+
 
 def solve_1(grid, commands):
-    w = max([len(line) for line in grid])
-    h = len(grid)
     pos = find_start(grid)
     state = (pos, R)
     for command in commands:
@@ -20,6 +21,14 @@ def solve_1(grid, commands):
     d = state[1]
     return 1000*row + col*4 + d
 
+
+def solve_2(grid, commands):
+    w = max([len(line) for line in grid])
+    h = len(grid)
+    return face_n(50,0), face_n(50, 50), face_n(50, 100)
+
+def face_n(i, j):
+    return N_FACE_COLS*(i//FACE_SIZE)+j//FACE_SIZE
 
 def apply_command(grid, state, command):
     pos, d = state
@@ -90,6 +99,10 @@ def find_start(grid):
 
 lines = [line[:-1] for line in fileinput.input()]
 w = len(lines[0])
+if w == 12:
+    FACE_SIZE = 4
+    N_FACE_COLS = 4
 grid = [line.ljust(w, ' ') for line in lines[:-2]]
 commands = re.split(r'([0-9]+)', lines[-1])[1:-1]
 print(solve_1(grid, commands))
+print(solve_2(grid, commands))
