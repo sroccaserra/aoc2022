@@ -2,53 +2,55 @@ from fileinput import input
 from collections import deque
 
 
-def solve_1(blizzards, w, h):
+def solve_1():
     start = ((1, 0), 0)
     q = deque([start])
     seen = set([start])
-    bs_hist = [blizzards]
     while q:
         ((x, y), d) = q.popleft()
-        if x == w - 2 and y == h - 2:
+        if x == W - 2 and y == H - 2:
             return d+1
-        while len(bs_hist) < d+2:
-            bs_last = bs_hist[-1]
-            bs_hist.append(blow(bs_last, w, h))
-        ns = neighbors(bs_hist[d+1], w, h, x, y)
+        ns = neighbors(get_blizzards(d+1), x, y)
         for n in ns:
             candidate = (n, d+1)
             if candidate in seen:
                 continue
             seen.add(candidate)
             q.append(candidate)
+    assert False
 
-    return None
 
-
-def neighbors(blizzards, w, h, x, y):
+def neighbors(blizzards, x, y):
     blocked = set([pos for (pos, _, _) in blizzards])
     result = []
     for n in ((x, y), (x+1, y), (x-1, y), (x, y+1), (x, y-1)):
         if n == (1, 0):
             result.append(n)
-        elif n not in blocked and (0 < n[0] < w-1) and (0 < n[1] < h - 1):
+        elif n not in blocked and (0 < n[0] < W-1) and (0 < n[1] < H - 1):
             result.append(n)
     return result
 
 
-def blow(blizzards, w, h):
+def get_blizzards(n):
+    while len(BLIZZARDS) < n+2:
+        bs_last = BLIZZARDS[-1]
+        BLIZZARDS.append(blow(bs_last))
+    return BLIZZARDS[n]
+
+
+def blow(blizzards):
     result = []
     for ((x, y), (dx, dy), c) in blizzards:
         x = x + dx
-        if w-1 <= x:
+        if W-1 <= x:
             x = 1
         if x <= 0:
-            x = w-2
+            x = W-2
         y = y + dy
-        if h-1 <= y:
+        if H-1 <= y:
             y = 1
         if y <= 0:
-            y = h-2
+            y = H-2
         result.append(((x, y), (dx, dy), c))
     return tuple(result)
 
@@ -75,13 +77,14 @@ def print_blizzards(blizzards, w, h):
 
 lines = [line.strip() for line in input()]
 blizzard_list = []
-w = len(lines[0])
-h = len(lines)
-for y in range(h):
+W = len(lines[0])
+H = len(lines)
+for y in range(H):
     line = lines[y]
-    for x in range(w):
+    for x in range(W):
         c = line[x]
         if c in '>v<^':
             blizzard_list.append(((x, y), DIRS[c], c))
-blizzards = tuple(blizzard_list)
-print(solve_1(blizzards, w, h))
+BLIZZARDS = [tuple(blizzard_list)]
+PART_ONE = solve_1()
+print(PART_ONE)
