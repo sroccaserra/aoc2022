@@ -3,14 +3,25 @@ from collections import deque
 
 
 def solve_1():
-    start = ((1, 0), 0)
-    q = deque([start])
-    seen = set([start])
+    return trip((1, 0), (W-2, H-2), 0)
+
+
+def solve_2():
+    t_1 = PART_ONE
+    t_2 = trip((W-2, H-1), (1, 1), t_1)
+    t_3 = trip((1, 0), (W-2, H-2), t_1+t_2)
+    return t_1 + t_2 + t_3
+
+
+def trip(start, dest, t_0):
+    start_state = (start, 0)
+    q = deque([start_state])
+    seen = set([start_state])
     while q:
         ((x, y), d) = q.popleft()
-        if x == W - 2 and y == H - 2:
+        if (x, y) == dest:
             return d+1
-        ns = neighbors(get_blizzards(d+1), x, y)
+        ns = neighbors(get_blizzards(d+1+t_0), x, y)
         for n in ns:
             candidate = (n, d+1)
             if candidate in seen:
@@ -24,7 +35,7 @@ def neighbors(blizzards, x, y):
     blocked = set([pos for (pos, _, _) in blizzards])
     result = []
     for n in ((x, y), (x+1, y), (x-1, y), (x, y+1), (x, y-1)):
-        if n == (1, 0):
+        if n == (1, 0) or n == (W-2, H-1):
             result.append(n)
         elif n not in blocked and (0 < n[0] < W-1) and (0 < n[1] < H - 1):
             result.append(n)
@@ -88,3 +99,4 @@ for y in range(H):
 BLIZZARDS = [tuple(blizzard_list)]
 PART_ONE = solve_1()
 print(PART_ONE)
+print(solve_2())
