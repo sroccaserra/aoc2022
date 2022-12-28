@@ -3,6 +3,24 @@ import re
 from collections import deque
 
 
+def compute_distances(graph, nodes, indexes):
+    n = len(nodes)
+    dists = []
+    for _ in range(n):
+        dists.append([99999]*n)
+    for i in range(n):
+        node = nodes[i]
+        dists[i][i] = 0
+        for c in graph[node][CHILDREN]:
+            dists[i][indexes[c]] = 1
+    for k in range(n):
+        for i in range(n):
+            for j in range(n):
+                if dists[i][j] > dists[i][k]+dists[k][j]:
+                    dists[i][j] = dists[i][k]+dists[k][j]
+    return dists
+
+
 def solve_1(graph):
     opened = set()
     to_open = set()
@@ -34,38 +52,28 @@ def solve_1(graph):
 
 
 def find_target(graph, time_left, to_open, src):
-    distances = {src: NaD}
-    q = deque([(src, 0)])
-    while q:
-        (name, d) = q.popleft()
-        node = graph[name]
-        for c in node[CHILDREN]:
-            if c not in distances:
-                new_dist = d + 1
-                if c in to_open:
-                    distances[c] = new_dist
-                else:
-                    distances[c] = NaD
-                q.append((c, new_dist))
     farthest = 0
-    for n in distances:
-        d = distances[n]
+    for n in to_open:
+        d = distance(src, n)
+        if d != NaD:
+            assert distance(src, n) == d
         if farthest < d:
             farthest = d
 
     candidate = next(iter(to_open))
-    max_gain = (candidate, distances[candidate])
-    for (n, d) in distances.items():
-        if d == NaD:
+    max_gain = (candidate, distance(src, candidate))
+    target_t = farthest + OPENING_T
+    for n in to_open:
+        d = distance(src, n)
+        if d == 0:
             continue
-        target_t = farthest + OPENING_T
         pressure = graph[n][PRESSURE]
         released = (target_t - d - OPENING_T)*pressure
         if max_gain[1] < released:
             max_gain = (n, released)
 
     target_name = max_gain[0]
-    return (target_name, distances[target_name])
+    return (target_name, distance(src, target_name))
 
 
 def print_mermaid(graph):
@@ -86,6 +94,12 @@ def print_mermaid(graph):
                 print(name, '---', c)
 
 
+def distance(src, dst):
+    i = INDEXES[src]
+    j = INDEXES[dst]
+    return DISTS[i][j]
+
+
 NAME = 0
 PRESSURE = 1
 CHILDREN = 2
@@ -104,5 +118,12 @@ readings = [parse(line.strip()) for line in fileinput.input()]
 graph = {}
 for reading in readings:
     graph[reading[NAME]] = reading
-# print_mermaid(graph)
+NODES = list(graph.keys())
+NODES.sort()
+INDEXES = {}
+for i in range(len(NODES)):
+    INDEXES[NODES[i]] = i
+DISTS = compute_distances(graph, NODES, INDEXES)
+print(NODES)
+print(DISTS)
 print(solve_1(graph))
