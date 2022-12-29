@@ -1,6 +1,7 @@
 import fileinput
 import re
 from collections import deque
+from itertools import combinations, product
 
 
 def compute_distances(graph, nodes, indexes):
@@ -52,6 +53,13 @@ def solve_1(graph):
 
 
 def find_target(graph, time_left, to_open, src):
+    for a, b in combinations(to_open, 2):
+        target_t = max(distance(src, a)+OPENING_T+distance(a,b)+OPENING_T,
+                distance(src,b)+OPENING_T+distance(b,a))
+        print(a, b, target_t)
+    return find_target_1(graph, time_left, to_open, src)
+
+def find_target_1(graph, time_left, to_open, src):
     farthest = 0
     for n in to_open:
         d = distance(src, n)
@@ -100,6 +108,24 @@ def distance(src, dst):
     return DISTS[i][j]
 
 
+def print_to_open_distances():
+    print(''.rjust(2), end='')
+    for i in range(len(NODES)):
+        name = NODES[i]
+        if name == 'AA' or graph[name][PRESSURE] > 0:
+            print(f'{name}'.rjust(3), end='')
+    print()
+    for i in range(len(NODES)):
+        name = NODES[i]
+        if name == 'AA' or graph[name][PRESSURE] > 0:
+            print(f'{name}'.rjust(2), end='')
+            for j in range(len(NODES)):
+                other = NODES[j]
+                if other == 'AA' or graph[other][PRESSURE] > 0:
+                    print(f'{DISTS[i][j]}'.rjust(3), end='')
+            print()
+
+
 NAME = 0
 PRESSURE = 1
 CHILDREN = 2
@@ -124,6 +150,5 @@ INDEXES = {}
 for i in range(len(NODES)):
     INDEXES[NODES[i]] = i
 DISTS = compute_distances(graph, NODES, INDEXES)
-print(NODES)
-print(DISTS)
-print(solve_1(graph))
+print_to_open_distances()
+# print(solve_1(graph))
