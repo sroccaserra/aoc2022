@@ -2,24 +2,7 @@ import fileinput
 import re
 from collections import deque
 from itertools import combinations, product
-
-
-def compute_distances(graph, nodes, indexes):
-    n = len(nodes)
-    dists = []
-    for _ in range(n):
-        dists.append([99999]*n)
-    for i in range(n):
-        node = nodes[i]
-        dists[i][i] = 0
-        for c in graph[node][CHILDREN]:
-            dists[i][indexes[c]] = 1
-    for k in range(n):
-        for i in range(n):
-            for j in range(n):
-                if dists[i][j] > dists[i][k]+dists[k][j]:
-                    dists[i][j] = dists[i][k]+dists[k][j]
-    return dists
+from dataclasses import dataclass, field
 
 
 def solve_1(graph):
@@ -58,6 +41,11 @@ def find_target(graph, time_left, to_open, src):
                 distance(src,b)+OPENING_T+distance(b,a))
         print(a, b, target_t)
     return find_target_1(graph, time_left, to_open, src)
+
+
+def distance(src, dst):
+    return ZZ[src][dst]
+
 
 def find_target_1(graph, time_left, to_open, src):
     farthest = 0
@@ -102,28 +90,34 @@ def print_mermaid(graph):
                 print(name, '---', c)
 
 
-def distance(src, dst):
-    i = INDEXES[src]
-    j = INDEXES[dst]
-    return DISTS[i][j]
-
-
-def print_to_open_distances():
+def print_to_open_distances(reduced_list, reduced_dists):
     print(''.rjust(2), end='')
-    for i in range(len(NODES)):
-        name = NODES[i]
-        if name == 'AA' or graph[name][PRESSURE] > 0:
-            print(f'{name}'.rjust(3), end='')
+    for name in reduced_list:
+        print(f'{name}'.rjust(3), end='')
     print()
-    for i in range(len(NODES)):
-        name = NODES[i]
-        if name == 'AA' or graph[name][PRESSURE] > 0:
-            print(f'{name}'.rjust(2), end='')
-            for j in range(len(NODES)):
-                other = NODES[j]
-                if other == 'AA' or graph[other][PRESSURE] > 0:
-                    print(f'{DISTS[i][j]}'.rjust(3), end='')
-            print()
+    for i in reduced_list:
+        print(f'{i}'.rjust(2), end='')
+        for j in reduced_list:
+            print(f'{reduced_dists[i][j]}'.rjust(3), end='')
+        print()
+
+
+def compute_distances(graph, nodes, indexes):
+    n = len(nodes)
+    dists = []
+    for _ in range(n):
+        dists.append([99999]*n)
+    for i in range(n):
+        node = nodes[i]
+        dists[i][i] = 0
+        for c in graph[node][CHILDREN]:
+            dists[i][indexes[c]] = 1
+    for k in range(n):
+        for i in range(n):
+            for j in range(n):
+                if dists[i][j] > dists[i][k]+dists[k][j]:
+                    dists[i][j] = dists[i][k]+dists[k][j]
+    return dists
 
 
 NAME = 0
@@ -140,15 +134,50 @@ def parse(line):
     return (words[1], rate, [re.sub(',','', w) for w in words[9:]])
 
 
+def reduce_graph(graph):
+    nodes = list(graph.keys())
+    nodes.sort()
+    indexes = {}
+    for i in range(len(nodes)):
+        indexes[nodes[i]] = i
+    reduced_list = ['AA']
+    for name in graph:
+        if graph[name][PRESSURE] > 0:
+                reduced_list.append(name)
+    reduced_list.sort()
+
+    dists = compute_distances(graph, nodes, indexes)
+    reduced_dists = {}
+    for i in range(len(reduced_list)):
+        node_i = reduced_list[i]
+        reduced_dists[node_i] = {}
+        for j in range(len(reduced_list)):
+            node_j = reduced_list[j]
+            ii = indexes[node_i]
+            jj = indexes[node_j]
+            reduced_dists[node_i][node_j] = dists[ii][jj]
+    return reduced_list, reduced_dists
+
+
+@dataclass
+class Arc:
+    tip: 'Vertex'
+    length: int
+
+@dataclass
+class Vertex:
+    name: str
+    arcs: list[Arc] = field(default_factory=list)
+
+
 readings = [parse(line.strip()) for line in fileinput.input()]
 graph = {}
+verts = []
 for reading in readings:
     graph[reading[NAME]] = reading
-NODES = list(graph.keys())
-NODES.sort()
-INDEXES = {}
-for i in range(len(NODES)):
-    INDEXES[NODES[i]] = i
-DISTS = compute_distances(graph, NODES, INDEXES)
-print_to_open_distances()
+    vert = Vertex(reading[NAME])
+
+reduced_list, reduced_dists = reduce_graph(graph)
+print(reduced_dists)
+print_to_open_distances(reduced_list, reduced_dists)
 # print(solve_1(graph))
