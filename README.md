@@ -1,3 +1,11 @@
+Note: deprecated.
+
+See instead:
+
+- <https://github.com/sroccaserra/advent-of-code>
+
+----
+
 - <http://adventofcode.com/2022>
 
 See also:
